@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Игра: 3 одинаковых цифры</title>
+    <style>
+        body { text-align: center; font-family: Arial; margin-top: 50px; }
+        .number-box { display: inline-block; font-size: 2em; margin: 10px; width: 60px; height: 60px;
+                      line-height: 60px; background: #f0f0f0; border-radius: 8px; }
+        .button { padding: 10px 20px; font-size: 1em; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Собери 3 одинаковые цифры</h1>
+
+    {% if numbers %}
+        <div>
+            {% for number in numbers %}
+                <div class="number-box">{{ number }}</div>
+            {% endfor %}
+        </div>
+        <h2>{{ result }}</h2>
+    {% endif %}
+
+    <form action="{% url 'play' %}" method="post">
+        {% csrf_token %}
+        <button class="button" type="submit">Играть</button>
+    </form>
+</body>
+</html>

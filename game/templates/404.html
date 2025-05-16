@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Сторінку не знайдено | Слот Гра{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center py-5">
+            <div class="display-1 text-primary mb-4">404</div>
+            <h2 class="mb-4">Ой, сторінку не знайдено!</h2>
+            <p class="lead mb-4">Схоже, що сторінка, яку ви шукаєте, не існує або була переміщена.</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'slot_game' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-house-door me-2"></i>На головну
+                </a>
+                <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Увійти
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

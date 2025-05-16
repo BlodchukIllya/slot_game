@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Профіль гравця{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card bg-dark text-white mb-4">
+                <div class="card-header bg-primary">
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-circle me-2"></i>Профіль
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="avatar-circle" style="width: 100px; height: 100px; background-color: #4e73df; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                            <span style="color: white; font-size: 40px;">{{ player.user.username|first|upper }}</span>
+                        </div>
+                        <h4>{{ player.user.username }}</h4>
+                        <p class="text-muted">Гравечок</p>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <h5>Баланс: <span class="float-end">{{ player.balance|floatformat:2 }} ₴</span></h5>
+                    </div>
+                    <div class="mb-3">
+                        <h5>Загалом ігор: <span class="float-end">{{ total_games }}</span></h5>
+                    </div>
+                    <div class="mb-3">
+                        <h5>Виграші: <span class="float-end">{{ total_wins }}</span></h5>
+                    </div>
+                    <div class="mb-3">
+                        <h5>Джекпоти: <span class="float-end">{{ total_jackpots }}</span></h5>
+                    </div>
+                    <div class="mb-3">
+                        <h5>Відсоток перемог: <span class="float-end">{{ win_rate }}%</span></h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card bg-dark text-white mb-4">
+                <div class="card-header bg-primary">
+                    <h4 class="mb-0">
+                        <i class="bi bi-clock-history me-2"></i>Останні ігри
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if recent_games %}
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Ставка</th>
+                                        <th>Результат</th>
+                                        <th>Виграш</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for game in recent_games %}
+                                        <tr>
+                                            <td>{{ game.created_at|date:"d.m.Y H:i" }}</td>
+                                            <td>{{ game.bet_amount|floatformat:2 }} ₴</td>
+                                            <td>
+                                                {% if game.result == 'WIN' %}
+                                                    <span class="badge bg-success">Виграш</span>
+                                                {% elif game.result == 'LOSS' %}
+                                                    <span class="badge bg-danger">Програш</span>
+                                                {% elif game.result == 'JACKPOT' %}
+                                                    <span class="badge bg-warning">Джекпот!</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="{% if game.win_amount > 0 %}text-success{% else %}text-danger{% endif %}">
+                                                {% if game.win_amount > 0 %}+{% endif %}{{ game.win_amount|floatformat:2 }} ₴
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-end mt-3">
+                            <a href="{% url 'game_history' %}" class="btn btn-primary">
+                                <i class="bi bi-list-ul me-1"></i>Повна історія ігор
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            <i class="bi bi-info-circle me-2"></i>Ви ще не зіграли жодної гри.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card bg-dark text-white">
+                <div class="card-header bg-primary">
+                    <h4 class="mb-0">
+                        <i class="bi bi-graph-up me-2"></i>Статистика
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p>Тут буде графік статистики гри...</p>
+                    <!-- We can add charts here later using Chart.js or similar -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Реєстрація - Слот Гра{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow mt-5">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4">Створити обліковий запис</h2>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label">Ім'я користувача</label>
+                            <input type="text" 
+                                   name="username" 
+                                   class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
+                                   id="id_username" 
+                                   value="{{ form.username.value|default:'' }}"
+                                   required
+                                   autofocus>
+                            {% if form.username.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.username.errors.0 }}
+                                </div>
+                            {% else %}
+                                <div class="form-text">
+                                    Не більше 150 символів. Тільки букви, цифри та символи @/./+/-/_.
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_password1" class="form-label">Пароль</label>
+                                <input type="password" 
+                                       name="password1" 
+                                       class="form-control {% if form.password1.errors %}is-invalid{% endif %}" 
+                                       id="id_password1" 
+                                       required>
+                                {% if form.password1.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.password1.errors.0 }}
+                                    </div>
+                                {% else %}
+                                    <div class="form-text">
+                                        Мінімум 8 символів. Не може бути загальновживаним або повністю числовим.
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="id_password2" class="form-label">Підтвердження паролю</label>
+                                <input type="password" 
+                                       name="password2" 
+                                       class="form-control {% if form.password2.errors %}is-invalid{% endif %}" 
+                                       id="id_password2" 
+                                       required>
+                                {% if form.password2.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.password2.errors.0 }}
+                                    </div>
+                                {% else %}
+                                    <div class="form-text">
+                                        Введіть той самий пароль ще раз для підтвердження.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">Зареєструватися</button>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <p class="mb-0">Вже маєте акаунт? <a href="{% url 'login' %}">Увійти</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Гральний автомат</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .balance {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background-color: #222;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.4rem;
+            z-index: 1000;
+        }
+
+        .slots {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .slot {
+            width: 100px;
+            height: 100px;
+            background: white;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+
+        button {
+            font-size: 1.2rem;
+            padding: 15px 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 25px;
+            font-size: 1.5rem;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <!-- Баланс -->
+    <div class="balance">Ваш баланс: {{ balance }} грн</div>
+
+    <!-- Назва -->
+    <h1>Гральний автомат 🎰</h1>
+
+    {% if results %}
+        <!-- Слоти -->
+        <div class="slots">
+            <div class="slot">{{ results.0 }}</div>
+            <div class="slot">{{ results.1 }}</div>
+            <div class="slot">{{ results.2 }}</div>
+            <div class="slot">{{ results.3 }}</div>
+            <div class="slot">{{ results.4 }}</div>
+        </div>
+    {% endif %}
+
+    <!-- Кнопка -->
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Грати</button>
+    </form>
+
+    {% if message %}
+        <p class="result">{{ message }}</p>
+    {% endif %}
+</body>
+</html>

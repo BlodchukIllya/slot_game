@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Грати - Слот Гра{% endblock %}
+
+{% block extra_css %}
+<style>
+    .game-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .slots {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin: 40px 0;
+    }
+
+    .slot {
+        width: 100px;
+        height: 100px;
+        background: white;
+        font-size: 3rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border: 2px solid #ddd;
+    }
+
+    .btn-play {
+        font-size: 1.5rem;
+        padding: 15px 40px;
+        border-radius: 50px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s;
+    }
+
+    .btn-play:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .bet-info {
+        margin: 20px 0;
+        font-size: 1.2rem;
+    }
+
+    .win-message {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 20px 0;
+        min-height: 2.5rem;
+    }
+
+    .win {
+        color: #28a745;
+    }
+
+    .loss {
+        color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <h1 class="mb-4">Грати в слоти</h1>
+    
+    <div class="bet-info">
+        <p>Мінімальна ставка: <strong>{{ min_bet|floatformat:2 }} ₴</strong></p>
+    </div>
+    
+    <div class="win-message">
+        {% if message %}
+            <div class="{% if is_win %}win{% else %}loss{% endif %}">
+                {{ message }}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="slots">
+        <div class="slot">{{ num1|default:7 }}</div>
+        <div class="slot">{{ num2|default:7 }}</div>
+        <div class="slot">{{ num3|default:7 }}</div>
+        <div class="slot">{{ num4|default:7 }}</div>
+        <div class="slot">{{ num5|default:7 }}</div>
+    </div>
+    
+    <form action="{% url 'play' %}" method="post" class="mb-4">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary btn-play" {% if user.player.balance < min_bet %}disabled{% endif %}>
+            Грати ({{ min_bet|floatformat:2 }} ₴)
+        </button>
+    </form>
+    
+    {% if user.player.balance < min_bet %}
+        <div class="alert alert-warning">
+            Недостатньо коштів для гри. Мінімальна ставка - {{ min_bet|floatformat:2 }} ₴
+        </div>
+    {% endif %}
+    
+    <div class="game-stats mt-4">
+        <h3>Статистика гри</h3>
+        <p>Перемоги: <strong>{{ user.player.wins|default:0 }}</strong> | Поразки: <strong>{{ user.player.losses|default:0 }}</strong></p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add any client-side interactivity here
+    document.addEventListener('DOMContentLoaded', function() {
+        // You can add animations or other client-side functionality here
+    });
+</script>
+{% endblock %}

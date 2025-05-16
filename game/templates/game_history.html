@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Історія ігор{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mb-0">
+                    <i class="bi bi-clock-history me-2"></i>Історія ігор
+                </h1>
+                <a href="{% url 'slot_game' %}" class="btn btn-primary">
+                    <i class="bi bi-arrow-left me-1"></i>Повернутись до гри
+                </a>
+            </div>
+            <hr>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            {% if game_sessions %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Ставка</th>
+                                <th>Результат</th>
+                                <th>Виграш</th>
+                                <th>Числа</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for session in game_sessions %}
+                                <tr>
+                                    <td>{{ session.created_at|date:"d.m.Y H:i" }}</td>
+                                    <td>{{ session.bet_amount|floatformat:2 }} ₴</td>
+                                    <td>
+                                        {% if session.result == 'WIN' %}
+                                            <span class="badge bg-success">Виграш</span>
+                                        {% elif session.result == 'LOSS' %}
+                                            <span class="badge bg-danger">Програш</span>
+                                        {% elif session.result == 'JACKPOT' %}
+                                            <span class="badge bg-warning">Джекпот!</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="{% if session.win_amount > 0 %}text-success{% else %}text-danger{% endif %}">
+                                        {% if session.win_amount > 0 %}+{% endif %}{{ session.win_amount|floatformat:2 }} ₴
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            {% for num in session.numbers %}
+                                                <span class="badge bg-primary px-2 py-1">{{ num }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if game_sessions.has_other_pages %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if game_sessions.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ game_sessions.previous_page_number }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">&laquo;</span>
+                                </li>
+                            {% endif %}
+
+                            {% for i in game_sessions.paginator.page_range %}
+                                {% if game_sessions.number == i %}
+                                    <li class="page-item active" aria-current="page">
+                                        <span class="page-link">{{ i }}</span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if game_sessions.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ game_sessions.next_page_number }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">&raquo;</span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>Ви ще не зіграли жодної гри.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
