@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
@@ -10,6 +11,8 @@ from django.http import HttpResponseNotFound
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from decimal import Decimal
 import random
+import json
+from datetime import datetime, timedelta
 from .models import Player, GameSession, Transaction
 
 # Game constants
@@ -314,26 +317,105 @@ def profile(request):
     """View to display user profile"""
     player = get_object_or_404(Player, user=request.user)
     
-    # Get user stats
+    # Get last 10 games
+    recent_games = GameSession.objects.filter(player=player).order_by('-created_at')[:10]
+    
+    # Calculate statistics
     total_games = GameSession.objects.filter(player=player).count()
     total_wins = GameSession.objects.filter(player=player, result='WIN').count()
     total_jackpots = GameSession.objects.filter(player=player, result='JACKPOT').count()
-    win_rate = (total_wins / total_games * 100) if total_games > 0 else 0
     
-    # Get recent games
-    recent_games = GameSession.objects.filter(player=player).order_by('-created_at')[:5]
+    if total_games > 0:
+        win_rate = (total_wins / total_games) * 100
+    else:
+        win_rate = 0
     
-    context = {
+    return render(request, 'profile.html', {
         'player': player,
+        'recent_games': recent_games,
         'total_games': total_games,
         'total_wins': total_wins,
         'total_jackpots': total_jackpots,
-        'win_rate': round(win_rate, 2),
-        'recent_games': recent_games,
-    }
-    
-    return render(request, 'profile.html', context)
+        'win_rate': win_rate
+    })
 
+@login_required
+def get_player_stats(request):
+    """Get player statistics for the chart"""
+    player = get_object_or_404(Player, user=request.user)
+    
+    # Get games from the last 30 days
+    thirty_days_ago = datetime.now() - timedelta(days=30)
+    games = GameSession.objects.filter(
+        player=player,
+        created_at__gte=thirty_days_ago
+    ).order_by('created_at')
+    
+    # Prepare data for the chart
+    labels = []
+    wins = []
+    losses = []
+    jackpots = []
+    
+    # Group games by day
+    current_date = None
+    win_count = 0
+    loss_count = 0
+    jackpot_count = 0
+    
+    for game in games:
+        game_date = game.created_at.date()
+        if game_date != current_date:
+            if current_date:
+                labels.append(current_date.strftime('%d.%m'))
+                wins.append(win_count)
+                losses.append(loss_count)
+                jackpots.append(jackpot_count)
+            current_date = game_date
+            win_count = 0
+            loss_count = 0
+            jackpot_count = 0
+            
+        if game.result == 'WIN':
+            win_count += 1
+        elif game.result == 'LOSS':
+            loss_count += 1
+        elif game.result == 'JACKPOT':
+            jackpot_count += 1
+    
+    # Add the last day's data
+    if current_date:
+        labels.append(current_date.strftime('%d.%m'))
+        wins.append(win_count)
+        losses.append(loss_count)
+        jackpots.append(jackpot_count)
+    
+    return JsonResponse({
+        'labels': labels,
+        'datasets': [
+            {
+                'label': 'Виграші',
+                'data': wins,
+                'backgroundColor': 'rgba(75, 192, 192, 0.2)',
+                'borderColor': 'rgba(75, 192, 192, 1)',
+                'borderWidth': 1
+            },
+            {
+                'label': 'Програші',
+                'data': losses,
+                'backgroundColor': 'rgba(255, 99, 132, 0.2)',
+                'borderColor': 'rgba(255, 99, 132, 1)',
+                'borderWidth': 1
+            },
+            {
+                'label': 'Джекпоти',
+                'data': jackpots,
+                'backgroundColor': 'rgba(255, 205, 86, 0.2)',
+                'borderColor': 'rgba(255, 205, 86, 1)',
+                'borderWidth': 1
+            }
+        ]
+    })
 
 def page_not_found(request, exception=None):
     """Custom 404 error handler"""

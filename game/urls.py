@@ -8,6 +8,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),  # Registration page
     path('history/', views.game_history, name='game_history'),  # Game history page
     path('profile/', views.profile, name='profile'),  # User profile page
+    path('stats/', views.get_player_stats, name='get_player_stats'),  # Statistics data
     
     # Authentication URLs
     path('login/', views.login_view, name='login'),

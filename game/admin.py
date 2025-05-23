@@ -166,9 +166,11 @@ class GameSessionAdmin(admin.ModelAdmin):
     bet_amount_display.admin_order_field = 'bet_amount'
 
     def win_amount_display(self, obj):
-        if obj.win_amount > 0:
-            return format_html('<span style="color: green;">+{:.2f} ₴</span>', obj.win_amount)
-        return f"{obj.win_amount:.2f} ₴"
+        amount = float(obj.win_amount)
+        amount_str = f"{amount:.2f}"
+        if amount > 0:
+            return format_html('<span style="color: green;">+{} ₴</span>', amount_str)
+        return format_html('{} ₴', amount_str)
     win_amount_display.short_description = 'Виграш'
     win_amount_display.admin_order_field = 'win_amount'
 
@@ -215,10 +217,13 @@ class TransactionAdmin(admin.ModelAdmin):
     transaction_type_display.admin_order_field = 'transaction_type'
 
     def amount_display(self, obj):
-        color = 'success' if obj.amount >= 0 else 'danger'
+        amount = float(obj.amount)
+        color = 'success' if amount >= 0 else 'danger'
+        sign = '+' if amount >= 0 else ''
+        formatted_amount = f"{amount:.2f}"
         return format_html(
-            '<span style="color: {};">{}{:.2f} ₴</span>',
-            color, '+' if obj.amount >= 0 else '', obj.amount
+            '<span style="color: {};">{}{} ₴</span>',
+            color, sign, formatted_amount
         )
     amount_display.short_description = 'Сума'
     amount_display.admin_order_field = 'amount'

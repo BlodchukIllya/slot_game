@@ -101,6 +101,9 @@
                     </h4>
                 </div>
                 <div class="card-body">
+                    <canvas id="statsChart"></canvas>
+                </div>
+                <div class="card-body">
                     <p>Тут буде графік статистики гри...</p>
                     <!-- We can add charts here later using Chart.js or similar -->
                 </div>
@@ -108,4 +111,48 @@
         </div>
     </div>
 </div>
+
+<script>
+    async function loadStatsChart() {
+        const response = await fetch('{% url "get_player_stats" %}');
+        const data = await response.json();
+        
+        const ctx = document.getElementById('statsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#fff'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#fff'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#fff'
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Статистика гри за останні 30 днів',
+                        color: '#fff'
+                    }
+                }
+            }
+        });
+    }
+    
+    document.addEventListener('DOMContentLoaded', loadStatsChart);
+</script>
 {% endblock %}
